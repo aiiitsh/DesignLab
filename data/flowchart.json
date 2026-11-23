@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "source": "SYDE 640 HW3 design flow chart (docs/HW3_Flow_Chart.pdf)",
+  "start": "plan_rq",
+  "nodes": {
+    "plan_rq": {
+      "type": "text", "lane": "plan", "stage": 1, "lecture": "M1, M3",
+      "text": "What is your research question?",
+      "help": "Start from a literature review: what causes what? An experiment is \"a test designed to objectively observe phenomena which are made to occur in a strictly controlled situation where one or more variables are varied, and the others are held constant.\" (Meeting 1)",
+      "placeholder": "e.g. Does a larger choice set (30 vs 6 candies) change decision difficulty and satisfaction?",
+      "next": "plan_hyp"
+    },
+    "plan_hyp": {
+      "type": "question", "lane": "plan", "stage": 1, "lecture": "M3–M4",
+      "text": "How is your hypothesis stated?",
+      "help": "H₀: no difference / no effect. H₁: an effect exists. A one-sided test needs the direction fixed before seeing the data; p is halved only when the data go the predicted way.",
+      "options": [
+        {"label": "Two-sided (≠)", "value": "two", "consequence": "Choose this if any difference counts, in either direction.", "next": "plan_vars"},
+        {"label": "One-sided: first group / condition higher (>)", "value": "greater", "consequence": "Choose this only if theory predicts the direction in advance.", "next": "plan_vars"},
+        {"label": "One-sided: first group / condition lower (<)", "value": "less", "consequence": "Choose this only if theory predicts the direction in advance.", "next": "plan_vars"}
+      ]
+    },
+    "plan_vars": {
+      "type": "form", "lane": "plan", "stage": 1, "lecture": "M2",
+      "text": "List your variables.",
+      "help": "IV: manipulated on purpose (its levels are the conditions). DV: the measured outcome. Control variables: held constant. Data type (NOIR): Nominal, Ordinal, Interval, Ratio. t-tests, ANOVA and linear regression need an interval/ratio DV. Operational definitions make the study replicable.",
+      "next": "plan_manip"
+    },
+    "plan_manip": {
+      "type": "question", "lane": "plan", "stage": 1, "lecture": "M1, M5–M6",
+      "text": "Can you manipulate the IV and randomly assign units to conditions?",
+      "help": "A true experiment gives the strongest basis for a causal claim (cause first, co-variation, no confound). Pre-existing groups (gender, age) or a surveyed continuous IV make it a quasi-experiment.",
+      "options": [
+        {"label": "Yes: true experiment", "value": "true", "consequence": "Strongest causal claim.", "next": "plan_controls"},
+        {"label": "No: quasi-experiment", "value": "quasi", "consequence": "Pre-existing groups or surveyed IV; the causal claim is weaker.", "next": "plan_controls", "flag": "weaker causal claim"}
+      ]
+    },
+    "plan_controls": {
+      "type": "multi", "lane": "plan", "stage": 1, "lecture": "M2, M9",
+      "text": "Which experimental controls will you build in?",
+      "help": "Randomize assignment and run order. Counterbalance order to control carryover: full = all n! orders; Latin square = n orders, each condition once per row and column. Block nuisance factors (subject, batch, operator) → randomized complete block design.",
+      "options": [
+        {"label": "Random assignment / run order", "value": "randomize"},
+        {"label": "Counterbalancing (full permutations)", "value": "counterbalance_full"},
+        {"label": "Counterbalancing (Latin square)", "value": "latin"},
+        {"label": "Blocking (subject, batch, operator)", "value": "block"},
+        {"label": "Practice trials / standard instructions", "value": "practice"},
+        {"label": "Placebo / double-blind", "value": "blind"}
+      ],
+      "next": "lane"
+    },
+    "lane": {
+      "type": "question", "lane": "choose", "stage": 2, "lecture": "M4–M14",
+      "text": "What is the research goal, and what type are the DV and IV(s)?",
+      "help": "Match the goal and the variable types to a lane, then follow that lane's decisions.",
+      "options": [
+        {"label": "A · Compare conditions", "value": "A", "consequence": "Numeric DV; categorical IV(s) with a few set levels → t-tests and ANOVA.", "next": "A_niv"},
+        {"label": "B · Model a relationship", "value": "B", "consequence": "Numeric DV; continuous IV(s), predict the DV → linear regression.", "next": "B_npred"},
+        {"label": "C · Categorical outcome", "value": "C", "consequence": "DV is a category (yes/no) or counts in a table → logistic regression / χ².", "next": "C_type"},
+        {"label": "D · Engineering optimization", "value": "D", "consequence": "Many controllable factors: screen → optimize → make robust.", "next": "D_goal"}
+      ]
+    },
+
+    "A_niv": {
+      "type": "question", "lane": "A", "stage": 2, "lecture": "M4–M10",
+      "text": "How many IVs (factors)?",
+      "help": "Each IV is a factor; its levels are the conditions.",
+      "options": [
+        {"label": "One IV", "value": "1", "consequence": "t-test or one-way ANOVA.", "next": "A_levels"},
+        {"label": "Two or more IVs (factorial)", "value": "2+", "consequence": "Factorial, repeated measures or mixed ANOVA.", "next": "A_nfactors"}
+      ]
+    },
+    "A_levels": {
+      "type": "question", "lane": "A", "stage": 2, "lecture": "M4, M6",
+      "text": "How many levels does the IV have?",
+      "help": "Why not many t-tests? Each test adds Type I risk (10 tests ≈ 40% false-alarm chance). Use one ANOVA, then corrected post hoc tests. (Meeting 6)",
+      "options": [
+        {"label": "2 levels", "value": "2", "consequence": "A t-test.", "next": "A_within2"},
+        {"label": "3 or more levels", "value": "3+", "consequence": "A one-way ANOVA.", "next": "A_within3"}
+      ]
+    },
+    "A_within2": {
+      "type": "question", "lane": "A", "stage": 2, "lecture": "M5", "helper": "within_between",
+      "text": "Does every participant do both levels?",
+      "help": "Within gives fewer people, removes individual differences and has more power, but risks carryover (practice, fatigue). Counterbalancing controls carryover. If learning effects are large and hard to counterbalance, use between.",
+      "options": [
+        {"label": "No: between-subject", "value": "between", "consequence": "Each person sees one level.", "outcome": "ttest_ind"},
+        {"label": "Yes: within-subject", "value": "within", "consequence": "Each person does both levels.", "outcome": "ttest_paired"}
+      ]
+    },
+    "A_within3": {
+      "type": "question", "lane": "A", "stage": 2, "lecture": "M6–M7", "helper": "within_between",
+      "text": "Does every participant do every level?",
+      "help": "Within gives fewer people, removes individual differences and has more power, but risks carryover (practice, fatigue). Block design = within-subject in engineering terms (subject = block).",
+      "options": [
+        {"label": "No: between-subject", "value": "between", "consequence": "Each person sees one level.", "outcome": "anova_oneway"},
+        {"label": "Yes: within-subject (or blocks)", "value": "within", "consequence": "Each person does every level.", "outcome": "anova_rm1"}
+      ]
+    },
+    "A_nfactors": {
+      "type": "numeric", "lane": "A", "stage": 2, "lecture": "M8–M10", "min": 2, "max": 6, "default": 2,
+      "text": "How many factors?",
+      "help": "Four-way and higher interactions are very hard to explain. Up to a three-way interaction is usually the most that can be explained.",
+      "warn_at": 4, "warn": "Four-way and higher interactions are very hard to explain.",
+      "next": "A_mix"
+    },
+    "A_mix": {
+      "type": "question", "lane": "A", "stage": 2, "lecture": "M8–M10", "helper": "within_between",
+      "text": "Is each IV within or between?",
+      "help": "Mixed design: at least one within IV and one between IV (e.g. gender between × task within). Sphericity applies to the within factors, homogeneity of variance to the between factors.",
+      "options": [
+        {"label": "All between", "value": "between", "consequence": "Factorial (n-way) between-subjects ANOVA.", "outcome": "anova_factorial"},
+        {"label": "All within", "value": "within", "consequence": "Two-way (n-way) repeated-measures ANOVA.", "outcome": "anova_rm"},
+        {"label": "Some of each (mixed)", "value": "mixed", "consequence": "Mixed (split-plot) ANOVA.", "outcome": "anova_mixed"}
+      ]
+    },
+
+    "B_npred": {
+      "type": "question", "lane": "B", "stage": 2, "lecture": "M12",
+      "text": "How many predictors (IVs)?",
+      "help": "ANOVA or regression? ANOVA: a few set levels, no shape assumed, any design. Regression: continuous IV, assumes a function, can predict new values.",
+      "options": [
+        {"label": "One predictor", "value": "1", "consequence": "Simple linear regression.", "outcome": "regression_simple"},
+        {"label": "Two or more predictors", "value": "2+", "consequence": "Multiple linear regression.", "next": "B_theory"}
+      ]
+    },
+    "B_theory": {
+      "type": "question", "lane": "B", "stage": 2, "lecture": "M12–M13",
+      "text": "Is the order of the predictors theory-driven or data-driven?",
+      "help": "Forward entry: the predictor with the highest simple correlation enters first, then the one with the largest semi-partial correlation.",
+      "options": [
+        {"label": "Theory-driven", "value": "theory", "consequence": "Hierarchical / Enter in blocks; report ΔR² and F change.", "outcome": "regression_hier"},
+        {"label": "Data-driven", "value": "data", "consequence": "Forward, backward or stepwise; watch for overfitting.", "outcome": "regression_step"}
+      ]
+    },
+
+    "C_type": {
+      "type": "question", "lane": "C", "stage": 2, "lecture": "M14, HW2",
+      "text": "What does the categorical data look like?",
+      "help": "The odds ratio multiplies the odds, not the probability. k levels → k − 1 dummies.",
+      "options": [
+        {"label": "Binary DV (2 outcomes)", "value": "binary", "consequence": "Binary logistic regression.", "outcome": "logistic"},
+        {"label": "Categorical IV × categorical DV (counts)", "value": "table", "consequence": "χ² test of independence (Fisher's exact when expected counts < 5).", "outcome": "chisquare"},
+        {"label": "DV with 3+ categories", "value": "multi", "consequence": "Multinomial logistic regression: not covered in SYDE 640.", "outcome": "not_covered"}
+      ]
+    },
+
+    "D_goal": {
+      "type": "question", "lane": "D", "stage": 2, "lecture": "M10–M11, Ch. 11–12",
+      "text": "Where are you in the engineering process?",
+      "help": "2ᵏ designs are for screening (early engineering, linear effects), not for finding causal mechanisms.",
+      "options": [
+        {"label": "Many candidate factors: which few matter?", "value": "screen", "consequence": "Factor screening with a 2ᵏ or 2ᵏ⁻ᵖ design.", "next": "D_budget"},
+        {"label": "Active factors known: find the best settings", "value": "optimize", "consequence": "Response surface methodology (curvature, steepest ascent, CCD).", "outcome": "doe_rsm"},
+        {"label": "Performance varies with uncontrollable noise", "value": "robust", "consequence": "Robust parameter design (Taguchi / response model).", "outcome": "doe_robust"}
+      ]
+    },
+    "D_budget": {
+      "type": "question", "lane": "D", "stage": 2, "lecture": "M10–M11",
+      "text": "Is there budget for all 2ᵏ runs?",
+      "help": "One replicate = 2ᵏ runs, in random order. Fractional designs: judge by effect size; they work best when within-condition variation is small.",
+      "options": [
+        {"label": "Yes, with 2+ replicates", "value": "replicated", "consequence": "Full-model ANOVA: F test for every effect.", "outcome": "doe_2k_rep"},
+        {"label": "Yes, but only 1 replicate", "value": "single", "consequence": "Effects, normal plot, then a reduced model.", "outcome": "doe_2k_single"},
+        {"label": "No: too many runs", "value": "fraction", "consequence": "Fractional factorial 2ᵏ⁻ᵖ.", "outcome": "doe_frac"}
+      ]
+    }
+  },
+
+  "outcomes": {
+    "ttest_ind": {"analysis_id": "ttest_ind", "name": "Independent-samples t-test", "design": "Between-subjects design, 1 IV with 2 levels", "data_shape": "long", "power_family": "ttest_ind", "lecture": "M4", "fallbacks": "Unequal variances → Welch's t-test. Non-normal → Mann-Whitney U."},
+    "ttest_paired": {"analysis_id": "ttest_paired", "name": "Paired-samples t-test", "design": "Within-subjects design, 1 IV with 2 levels", "data_shape": "wide", "power_family": "ttest_paired", "lecture": "M5", "fallbacks": "Non-normal differences → Wilcoxon signed-rank."},
+    "anova_oneway": {"analysis_id": "anova_oneway", "name": "One-way ANOVA", "design": "Between-subjects design, 1 IV with 3+ levels", "data_shape": "long", "power_family": "anova_oneway", "lecture": "M6", "fallbacks": "Unequal variances → Welch ANOVA + Games-Howell. Non-normal → Kruskal-Wallis + Dunn."},
+    "anova_rm1": {"analysis_id": "anova_rm1", "name": "One-way repeated-measures ANOVA", "design": "Within-subjects design, 1 IV with 3+ levels", "data_shape": "wide", "power_family": "rm_within", "lecture": "M7", "fallbacks": "Mauchly p < .05 → GG if ε < 0.60, else HF. Non-normal → Friedman + Conover."},
+    "anova_factorial": {"analysis_id": "anova_factorial", "name": "Factorial (n-way) ANOVA", "design": "Between-subjects factorial design", "data_shape": "long", "power_family": "anova_special", "lecture": "M8", "fallbacks": "No nonparametric version: transform, split + Bonferroni, or caveat."},
+    "anova_rm": {"analysis_id": "anova_rm", "name": "Two-way (n-way) repeated-measures ANOVA", "design": "Within-subjects factorial design", "data_shape": "wide", "power_family": "rm_within", "lecture": "M9", "fallbacks": "GG/HF per within effect. Non-normal → Friedman one factor at a time, or transform."},
+    "anova_mixed": {"analysis_id": "anova_mixed", "name": "Mixed ANOVA (split-plot)", "design": "Mixed design", "data_shape": "wide", "power_family": "rm_interaction", "lecture": "M9–M10", "fallbacks": "Within part → GG/HF. Between part → no Welch: transform, split + Bonferroni, or caveat."},
+    "regression_simple": {"analysis_id": "regression", "name": "Simple linear regression", "design": "Correlational design, 1 continuous predictor", "data_shape": "long", "power_family": "reg_r2", "lecture": "M12", "options": {"method": "enter"}, "fallbacks": "Transform the DV, add polynomial terms, or a GLM."},
+    "regression_hier": {"analysis_id": "regression", "name": "Multiple linear regression (hierarchical)", "design": "Correlational design, 2+ predictors entered in theory-driven blocks", "data_shape": "long", "power_family": "reg_r2_increase", "lecture": "M12–M13", "options": {"method": "hierarchical"}, "fallbacks": "VIF ≥ 10 → drop or combine predictors."},
+    "regression_step": {"analysis_id": "regression", "name": "Multiple linear regression (forward / backward / stepwise)", "design": "Correlational design, 2+ predictors, data-driven entry", "data_shape": "long", "power_family": "reg_r2", "lecture": "M12–M13", "options": {"method": "stepwise"}, "fallbacks": "Watch for overfitting; VIF ≥ 10 → drop or combine predictors."},
+    "logistic": {"analysis_id": "logistic", "name": "Binary logistic regression", "design": "Binary outcome, numeric and/or categorical predictors", "data_shape": "long", "power_family": "logistic", "lecture": "M14", "fallbacks": "≈10 events per predictor; check collinearity."},
+    "chisquare": {"analysis_id": "chisquare", "name": "χ² test of independence", "design": "Categorical IV × categorical DV", "data_shape": "long", "power_family": "chisq", "lecture": "HW2", "fallbacks": "Expected counts < 5 → Fisher's exact test."},
+    "not_covered": {"analysis_id": null, "name": "Multinomial / ordinal logistic regression", "design": "Not covered in SYDE 640", "data_shape": null, "power_family": null, "lecture": "M14", "note": "Named in Meeting 14 but not covered in SYDE 640. Consider collapsing to two categories (binary logistic) or a χ² test on the counts."},
+    "doe_2k_rep": {"analysis_id": "doe_2k", "name": "Replicated 2ᵏ factorial", "design": "2ᵏ factorial with replicates", "data_shape": "runsheet", "power_family": "anova_special", "lecture": "M10", "fallbacks": "Full-model ANOVA."},
+    "doe_2k_single": {"analysis_id": "doe_2k", "name": "Single-replicate 2ᵏ factorial", "design": "Unreplicated 2ᵏ factorial", "data_shape": "runsheet", "power_family": null, "lecture": "M10–M11", "fallbacks": "Normal/half-normal plot + Lenth's margin → reduced model; dropped factor → 2ᵏ⁻¹ with replicates."},
+    "doe_frac": {"analysis_id": "doe_frac", "name": "Fractional factorial 2ᵏ⁻ᵖ", "design": "Fractional factorial", "data_shape": "runsheet", "power_family": null, "lecture": "M11", "fallbacks": "De-alias with the other half (fold-over)."},
+    "doe_rsm": {"analysis_id": "doe_rsm", "name": "Response surface methodology", "design": "Centre points → steepest ascent → CCD / Box-Behnken", "data_shape": "runsheet", "power_family": null, "lecture": "Montgomery Ch. 11"},
+    "doe_robust": {"analysis_id": "doe_robust", "name": "Robust parameter design", "design": "Crossed array (Taguchi) or combined array (response model)", "data_shape": "runsheet", "power_family": null, "lecture": "Montgomery Ch. 12"}
+  }
+}

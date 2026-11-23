@@ -1,0 +1,17 @@
+# DesignLab runtime (Python 3.10+)
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+statsmodels>=0.14
+pingouin>=0.5.4
+scikit-posthocs>=0.9
+fastapi>=0.110
+uvicorn>=0.27
+pydantic>=2.5
+python-multipart>=0.0.9
+openpyxl>=3.1
+# tests
+pytest>=8
+httpx>=0.27
+# optional: one-click PDF export (otherwise the Report page uses the browser's Print to PDF)
+# playwright>=1.44   then:  python -m playwright install chromium
