@@ -6,17 +6,51 @@ Ahmed Hesham Desoky, 21280040
 
 Everything runs on your own computer. No data leaves it.
 
-## Run it (Windows)
+## Feature video (2 minutes)
 
-You only need **Python 3.10 or newer** (https://www.python.org/downloads/, tick "Add Python to PATH"). The web interface is already built and included, so Node.js is **not** needed.
+[![DesignLab feature video](media/video_cover.jpg)](media/DesignLab_features.mp4)
 
-1. Open a terminal in this folder. In File Explorer, click the address bar, type `cmd` and press Enter.
-2. Install the packages once: `pip install -r requirements.txt`
-3. Start it: `python run.py`, or double-click **start_designlab.bat**
-4. Your browser opens **http://127.0.0.1:8640**. If it doesn't, open that address yourself.
-5. Optional: run the validation suite with `python -m pytest -q`. It should show 50 passed.
+Click the image, then **View raw** or the download button to watch [`media/DesignLab_features.mp4`](media/DesignLab_features.mp4).
 
-Press Ctrl+C in the terminal to stop it. On macOS or Linux, use `python3` and `./start_designlab.sh`.
+## How to run it
+
+You only need **Python 3.10 or newer** (https://www.python.org/downloads/; on Windows tick "Add Python to PATH" during setup). The web interface is already built and included, so Node.js is **not** needed.
+
+### 1. Get the code
+
+Either click the green **Code → Download ZIP** button above and unzip it, or run:
+
+```
+git clone https://github.com/aiiitsh/DesignLab.git
+cd DesignLab
+```
+
+### 2. Install the Python packages (once)
+
+```
+pip install -r requirements.txt
+```
+
+### 3. Start DesignLab
+
+- **Windows:** double-click `start_designlab.bat`, or run `python run.py`
+- **macOS / Linux:** run `./start_designlab.sh`, or `python3 run.py`
+
+Your browser opens **http://127.0.0.1:8640**. If it doesn't, open that address yourself. Keep the terminal window open while you use the app; close it (or press Ctrl+C) to stop.
+
+### 4. Optional: check the numbers
+
+```
+python -m pytest -q
+```
+
+It should show **50 passed**.
+
+### Troubleshooting
+
+- `pip` or `python` not found: reinstall Python with "Add Python to PATH" ticked, or use `py -m pip install -r requirements.txt` and `py run.py`.
+- Port 8640 already in use: DesignLab is probably already running; open http://127.0.0.1:8640.
+- Changing the interface code (`web/src`) needs Node.js 18+: `cd web && npm ci && npm run build`.
 
 ## What's inside
 
