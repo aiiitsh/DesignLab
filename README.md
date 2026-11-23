@@ -10,7 +10,7 @@ Everything runs on your own computer. No data leaves it.
 
 [![DesignLab feature video](media/video_cover.jpg)](media/DesignLab_features.mp4)
 
-Click the image, then **View raw** or the download button to watch [`media/DesignLab_features.mp4`](media/DesignLab_features.mp4).
+The background music is an original track generated for this video by `media/make_music.py`, so it is free to use. Click the image, then **View raw** or the download button to watch [`media/DesignLab_features.mp4`](media/DesignLab_features.mp4).
 
 ## How to run it
 
